@@ -2,21 +2,39 @@ export default function PrimaryButton({
     className = '',
     disabled,
     processing = false,
+    size = 'md',
+    icon = null,
+    iconPosition = 'start',
     children,
     ...props
 }) {
     const isBusy = disabled || processing;
+
+    // Size variants
+    const sizeClasses = {
+        sm: 'min-h-[36px] px-3.5 py-1.5 text-xs rounded-lg gap-1.5',
+        md: 'min-h-[42px] px-5 py-2.5 text-sm rounded-xl gap-2',
+        lg: 'min-h-[48px] px-6 py-3 text-base rounded-2xl gap-2.5',
+    }[size] || 'min-h-[42px] px-5 py-2.5 text-sm rounded-xl gap-2';
+
     return (
         <button
             {...props}
             disabled={isBusy}
             className={
-                `relative inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 px-5 py-2.5 sm:py-3 text-center text-sm font-semibold tracking-wide text-white shadow-md shadow-emerald-600/20 transition-all duration-200 hover:from-emerald-500 hover:to-teal-500 hover:shadow-lg hover:shadow-emerald-600/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 dark:focus:ring-offset-zinc-900 ${className}`
+                `relative inline-flex items-center justify-center font-semibold tracking-wide text-white overflow-hidden ` +
+                `bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:via-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 ` +
+                `ring-1 ring-inset ring-white/25 dark:ring-white/20 ` +
+                `shadow-[0_1px_2px_rgba(0,0,0,0.1),0_4px_16px_rgba(16,185,129,0.28)] hover:shadow-[0_6px_22px_rgba(16,185,129,0.38)] ` +
+                `before:absolute before:inset-x-0 before:top-0 before:h-1/2 before:rounded-t-[inherit] before:bg-gradient-to-b before:from-white/20 before:to-transparent before:pointer-events-none before:opacity-80 ` +
+                `transition-all duration-150 ease-out focus:outline-none focus:ring-4 focus:ring-emerald-500/25 focus:ring-offset-2 dark:focus:ring-offset-zinc-900 ` +
+                `active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:active:scale-100 disabled:shadow-none ` +
+                `${sizeClasses} ${className}`
             }
         >
-            {isBusy && (
+            {isBusy ? (
                 <svg
-                    className="-ms-1 me-2 h-4 w-4 animate-spin text-white"
+                    className="h-4 w-4 shrink-0 animate-spin text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -35,8 +53,17 @@ export default function PrimaryButton({
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                 </svg>
+            ) : (
+                icon && iconPosition === 'start' && (
+                    <span className="shrink-0">{icon}</span>
+                )
             )}
+
             {children}
+
+            {!isBusy && icon && iconPosition === 'end' && (
+                <span className="shrink-0">{icon}</span>
+            )}
         </button>
     );
 }

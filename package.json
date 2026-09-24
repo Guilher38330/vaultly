@@ -23,5 +23,13 @@
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1"
+    },
+    "dependencies": {
+        "@react-three/drei": "^9.122.0",
+        "@react-three/fiber": "^8.18.0",
+        "framer-motion": "^13.4.2",
+        "recharts": "^3.10.1",
+        "sonner": "^2.0.8",
+        "three": "^0.170.0"
     }
 }

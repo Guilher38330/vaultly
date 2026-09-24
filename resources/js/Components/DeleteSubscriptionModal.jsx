@@ -4,6 +4,7 @@ import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { TrashIcon, AlertIcon } from '@/Components/Icons';
 import { router } from '@inertiajs/react';
+import { notifySubscriptionMutation, notifyMutationError } from '@/Utils/toastNotifications';
 
 function formatCurrency(amount, currency = 'BRL') {
     const num = Number(amount) || 0;
@@ -27,14 +28,20 @@ export default function DeleteSubscriptionModal({
     const handleDelete = () => {
         if (!subscription) return;
 
+        const subName = subscription.name;
         setProcessing(true);
         router.delete(route('subscriptions.destroy', subscription.id), {
             preserveScroll: true,
             onSuccess: () => {
+                notifySubscriptionMutation('deleted', subName);
                 setProcessing(false);
                 onClose();
             },
             onError: () => {
+                notifyMutationError(
+                    'Erro ao excluir assinatura',
+                    'Não foi possível remover a assinatura. Tente novamente em instantes.'
+                );
                 setProcessing(false);
             },
             onFinish: () => {

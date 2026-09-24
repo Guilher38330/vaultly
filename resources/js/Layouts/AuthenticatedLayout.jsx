@@ -14,7 +14,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-zinc-100/70 transition-colors duration-200 dark:bg-zinc-950">
-            <nav className="border-b border-zinc-200/80 bg-white/95 backdrop-blur-md transition-colors duration-200 dark:border-zinc-800/80 dark:bg-zinc-900/95">
+            <nav className="relative z-50 border-b border-zinc-200/80 bg-white/95 backdrop-blur-md transition-colors duration-200 dark:border-zinc-800/80 dark:bg-zinc-900/95">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 justify-between items-center">
                         <div className="flex items-center">

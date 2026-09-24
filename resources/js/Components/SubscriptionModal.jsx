@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import Modal from '@/Components/Modal';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
+import SelectInput from '@/Components/SelectInput';
+import ComboboxInput from '@/Components/ComboboxInput';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import { PlusIcon, PencilIcon, XMarkIcon } from '@/Components/Icons';
 import { useForm } from '@inertiajs/react';
+import { notifySubscriptionMutation, notifyMutationError } from '@/Utils/toastNotifications';
 
 export default function SubscriptionModal({
     show = false,
@@ -79,20 +82,42 @@ export default function SubscriptionModal({
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        const targetName = data.name;
+
         if (isEdit) {
             put(route('subscriptions.update', subscription.id), {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notifySubscriptionMutation('updated', targetName);
                     reset();
                     onClose();
+                },
+                onError: (formErrors) => {
+                    const count = Object.keys(formErrors || {}).length;
+                    notifyMutationError(
+                        'Erro ao atualizar assinatura',
+                        count > 1
+                            ? `Por favor, revise os ${count} campos destacados.`
+                            : 'Por favor, revise o campo destacado.'
+                    );
                 },
             });
         } else {
             post(route('subscriptions.store'), {
                 preserveScroll: true,
                 onSuccess: () => {
+                    notifySubscriptionMutation('created', targetName);
                     reset();
                     onClose();
+                },
+                onError: (formErrors) => {
+                    const count = Object.keys(formErrors || {}).length;
+                    notifyMutationError(
+                        'Erro ao cadastrar assinatura',
+                        count > 1
+                            ? `Por favor, revise os ${count} campos destacados.`
+                            : 'Por favor, revise o campo destacado.'
+                    );
                 },
             });
         }
@@ -143,6 +168,7 @@ export default function SubscriptionModal({
                             name="name"
                             value={data.name}
                             className="mt-1 block w-full"
+                            hasError={Boolean(errors.name)}
                             placeholder="Ex: Netflix, Spotify, AWS, GitHub Copilot"
                             isFocused={show && !isEdit}
                             onChange={(e) => setData('name', e.target.value)}
@@ -163,6 +189,7 @@ export default function SubscriptionModal({
                                 min="0.01"
                                 value={data.price}
                                 className="mt-1 block w-full"
+                                hasError={Boolean(errors.price)}
                                 placeholder="0.00"
                                 onChange={(e) => setData('price', e.target.value)}
                                 required
@@ -172,34 +199,36 @@ export default function SubscriptionModal({
 
                         <div>
                             <InputLabel htmlFor="currency" value="Moeda *" />
-                            <select
+                            <SelectInput
                                 id="currency"
                                 name="currency"
                                 value={data.currency}
                                 onChange={(e) => setData('currency', e.target.value)}
-                                className="mt-1 block w-full rounded-xl border border-zinc-300 bg-white/95 px-3.5 py-2.5 text-base sm:text-sm text-zinc-900 shadow-sm transition-all duration-200 hover:border-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/25"
+                                className="mt-1 block w-full"
+                                hasError={Boolean(errors.currency)}
                                 required
                             >
                                 <option value="BRL">BRL (R$)</option>
                                 <option value="USD">USD ($)</option>
                                 <option value="EUR">EUR (€)</option>
-                            </select>
+                            </SelectInput>
                             <InputError message={errors.currency} className="mt-1.5" />
                         </div>
 
                         <div>
                             <InputLabel htmlFor="billing_cycle" value="Ciclo *" />
-                            <select
+                            <SelectInput
                                 id="billing_cycle"
                                 name="billing_cycle"
                                 value={data.billing_cycle}
                                 onChange={(e) => setData('billing_cycle', e.target.value)}
-                                className="mt-1 block w-full rounded-xl border border-zinc-300 bg-white/95 px-3.5 py-2.5 text-base sm:text-sm text-zinc-900 shadow-sm transition-all duration-200 hover:border-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100 dark:hover:border-zinc-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/25"
+                                className="mt-1 block w-full"
+                                hasError={Boolean(errors.billing_cycle)}
                                 required
                             >
                                 <option value="monthly">Mensal</option>
                                 <option value="yearly">Anual</option>
-                            </select>
+                            </SelectInput>
                             <InputError message={errors.billing_cycle} className="mt-1.5" />
                         </div>
                     </div>
@@ -208,22 +237,17 @@ export default function SubscriptionModal({
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <InputLabel htmlFor="category" value="Categoria *" />
-                            <TextInput
+                            <ComboboxInput
                                 id="category"
                                 name="category"
-                                list="category-list"
                                 value={data.category}
-                                className="mt-1 block w-full"
+                                options={categories || []}
+                                className="mt-1"
+                                hasError={Boolean(errors.category)}
                                 placeholder="Ex: Streaming, Produtividade, Cloud"
                                 onChange={(e) => setData('category', e.target.value)}
                                 required
                             />
-                            <datalist id="category-list">
-                                {Array.isArray(categories) &&
-                                    categories.map((cat) => (
-                                        <option key={cat} value={cat} />
-                                    ))}
-                            </datalist>
                             <InputError message={errors.category} className="mt-1.5" />
                         </div>
 
@@ -238,6 +262,7 @@ export default function SubscriptionModal({
                                 type="date"
                                 value={data.next_billing_date}
                                 className="mt-1 block w-full"
+                                hasError={Boolean(errors.next_billing_date)}
                                 onChange={(e) =>
                                     setData('next_billing_date', e.target.value)
                                 }
@@ -296,7 +321,7 @@ export default function SubscriptionModal({
                             onChange={(e) => setData('notes', e.target.value)}
                             placeholder="Informações adicionais como forma de pagamento, detalhes do plano..."
                             maxLength={1000}
-                            className="mt-1 block w-full rounded-xl border border-zinc-300 bg-white/95 px-3.5 py-2.5 text-sm text-zinc-900 shadow-sm placeholder:text-zinc-400 transition-all duration-200 hover:border-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:hover:border-zinc-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/25"
+                            className="mt-1 block w-full rounded-xl border border-zinc-300/90 bg-white/95 px-3.5 py-2.5 text-sm text-zinc-900 shadow-xs placeholder:text-zinc-400 transition-all duration-200 hover:border-zinc-400 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/15 dark:border-zinc-700/80 dark:bg-zinc-900/90 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:hover:border-zinc-600 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/20"
                         />
                         <InputError message={errors.notes} className="mt-1.5" />
                     </div>
