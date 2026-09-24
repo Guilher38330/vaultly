@@ -21,14 +21,15 @@
 
 ## ✨ Funcionalidades
 
-- **📊 Painel Financeiro Multimoeda** — Projeção de gastos mensais e anuais separados por BRL, USD e EUR para assinaturas ativas.
-- **🔔 Alertas de Vencimento** — Banner automático com assinaturas que vencem nos próximos 7 dias.
+- **📊 Painel Financeiro Multimoeda** — Projeção de gastos mensais e anuais separados por BRL, USD e EUR.
+- **📈 Gráficos Analíticos** — Visualização de distribuição por categoria (Rosca) e projeção de caixa futuro (Área) usando **Recharts**.
+- **🔔 Notificações Inteligentes** — Sistema de toast elegante e moderno (via **Sonner**) para feedback instantâneo nas ações de CRUD.
+- **✨ Animações Fluidas** — Transições de layout, entradas em cascata e modais com física de mola alimentados pelo **Framer Motion**.
+- **🌌 Experiência 3D** — Showcase cósmico interativo nas telas de autenticação renderizado em WebGL com **React Three Fiber**.
 - **⏸️ Pausar / Ativar** — Toggle rápido de status direto na listagem; assinaturas pausadas são excluídas dos totais projetados.
-- **🏷️ Badges por Categoria** — Cores determinísticas e consistentes geradas automaticamente a partir do nome da categoria.
-- **🔍 Filtros e Busca** — Pesquisa em tempo real por nome, e filtros por categoria, ciclo de cobrança e status.
-- **📱 Interface Responsiva** — Tabela completa no desktop e cartões otimizados para toque no celular.
+- **🏷️ Badges e Filtros** — Cores geradas automaticamente a partir da categoria, com pesquisa e filtro em tempo real.
+- **📱 Componentes Acessíveis** — Selects customizados e comboboxes totalmente navegáveis via teclado usando **Headless UI**.
 - **🌙 Modo Claro / Escuro** — Alternância suave com paleta esmeralda e persistência via `localStorage`.
-- **🌌 Telas de Autenticação Cósmicas** — Layout split-screen com painel animado (planetas flutuantes, estrelas cintilantes) em verde esmeralda.
 
 ---
 
@@ -107,7 +108,9 @@ Acesse em: **http://localhost**
 |---|---|
 | Backend | Laravel 12 + PHP 8.5 |
 | Frontend | React 18 + Inertia.js v2 |
-| Estilização | Tailwind CSS v4 |
+| Estilização | Tailwind CSS v4 + Headless UI |
+| Animações & UI | Framer Motion + Sonner |
+| Gráficos & 3D | Recharts + React Three Fiber |
 | Build | Vite 8 |
 | Ambiente | Laravel Sail (Docker) |
 | Testes | PHPUnit / Laravel Feature Tests |
