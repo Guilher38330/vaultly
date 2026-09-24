@@ -1,14 +1,14 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import CosmicShowcasePanel from '@/Components/CosmicShowcasePanel';
+import CosmicShowcase3D from '@/Components/CosmicShowcase3D';
 import ThemeToggle from '@/Components/ThemeToggle';
 import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({
     children,
-    badge = 'PORTAL CÓSMICO',
-    title = 'Hello!',
+    badge = 'PORTAL DE ACESSO',
+    title = 'HELLO!',
     subtitle = 'HAVE A GOOD DAY',
-    description = 'Explore um universo de possibilidades em nossa plataforma segura e moderna.',
+    description = 'Seja bem-vindo de volta! Acesse sua conta para continuar sua jornada pelo universo digital.',
     showcasePosition = 'left',
 }) {
     const isShowcaseRight = showcasePosition === 'right';
@@ -24,7 +24,7 @@ export default function GuestLayout({
                 key={showcasePosition}
                 className="animate-card-entrance relative z-10 grid w-full max-w-5xl xl:max-w-6xl grid-cols-1 overflow-hidden rounded-2xl sm:rounded-[2rem] border border-zinc-200/80 bg-white shadow-2xl shadow-zinc-900/10 transition-colors duration-300 dark:border-zinc-800/80 dark:bg-zinc-900 dark:shadow-black/60 lg:grid-cols-12"
             >
-                {/* Cosmic Papercut Visual Showcase */}
+                {/* Cosmic 3D Interactive Visual Showcase */}
                 <div
                     className={`order-1 p-2 sm:p-3 lg:col-span-6 lg:p-3 xl:p-4 ${
                         isShowcaseRight
@@ -32,7 +32,7 @@ export default function GuestLayout({
                             : 'lg:order-1 animate-slide-in-left'
                     }`}
                 >
-                    <CosmicShowcasePanel
+                    <CosmicShowcase3D
                         badgeText={badge}
                         welcomeTitle={title}
                         welcomeSubtitle={subtitle}

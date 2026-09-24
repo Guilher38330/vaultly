@@ -1,100 +1,79 @@
-# Final Project Orchestration Handoff: Subscription Tracker Feature
+# Soft Handoff Report — Project Orchestrator (Generation 1 to Successor Generation 2)
 
-**Identity**: Project Orchestrator (`orchestrator_1`)  
-**Project**: Subscription Tracker on Dashboard  
-**Date**: 2026-09-22  
-**Parent / Sentinel Recipient ID**: `2cd66839-f452-4e3d-82dc-dfe1eecc1ca4`  
-
----
-
-## 1. Observation
-
-All 5 project milestones have been designed, implemented, reviewed, challenged, and forensically audited with 100% genuine code and zero regressions:
-
-1. **Milestone 1 — Data & Eloquent Layer**:
-   - `database/migrations/2026_09_22_000001_create_subscriptions_table.php`: `subscriptions` table with foreign key `user_id` cascade, columns for `name`, `price` (decimal 10,2), `currency` (default BRL), `billing_cycle`, `category`, `next_billing_date`, `status` (default active), `notes`, and composite indexes on `[user_id, status]` and `[user_id, next_billing_date]`.
-   - `app/Models/Subscription.php`: Eloquent model with mass assignment protection (`#[Fillable]`), `scopeActive`, `scopeDueSoon($days = 7)`, accessors for `monthly_equivalent_price` (yearly / 12) and `yearly_equivalent_price` (monthly * 12), and `user(): BelongsTo`.
-   - `app/Models/User.php`: added `subscriptions(): HasMany`.
-   - `database/factories/SubscriptionFactory.php` & `database/seeders/SubscriptionSeeder.php`: realistic mock data (Netflix, AWS, Spotify, GitHub, ChatGPT, YouTube, Adobe) registered in `DatabaseSeeder.php`.
-
-2. **Milestone 2 — Security, Policy & API Layer**:
-   - `app/Policies/SubscriptionPolicy.php`: Strict Tenant Isolation (Anti-IDOR) ensuring `$user->id === $subscription->user_id` for view, update, delete, and toggle status. Registered in `AppServiceProvider.php`.
-   - `app/Http/Requests/SubscriptionRequest.php`: Anti-XSS sanitization via `prepareForValidation()` using `strip_tags()` and `trim()` on text inputs (`name`, `category`, `notes`), plus strict validation rules (`price min:0.01`, currencies in BRL/USD/EUR, cycle in monthly/yearly, date format).
-   - `app/Http/Resources/SubscriptionResource.php`: Whitelisted safe field serialization (id, name, price, currency, billing_cycle, category, next_billing_date, status, notes, monthly/yearly equivalents, is_due_soon, days_until_due), preventing Inertia prop data leaks.
-   - `app/Http/Controllers/SubscriptionController.php`: `index` calculating projected monthly totals per currency strictly for active subscriptions (paused excluded), due soon highlight (< 7 days), categories; `store`, `update`, `destroy`, `toggleStatus`.
-   - `routes/web.php`: mapped `/dashboard` to `SubscriptionController@index` and mutation endpoints under `['auth', 'throttle:60,1']`.
-
-3. **Milestone 3 — Frontend (Inertia v2 + React 18 + Tailwind CSS)**:
-   - `resources/js/Components/CategoryBadge.jsx`: Deterministic 32-bit bitwise rolling hash algorithm mapping category strings across 10 curated light/dark Tailwind palettes.
-   - `resources/js/Components/SubscriptionModal.jsx`: Create/Edit modal with Inertia v2 `useForm`, `<datalist id="category-list">` suggestions, multi-currency support, and inline `InputError` messages.
-   - `resources/js/Components/DeleteSubscriptionModal.jsx`: Safe deletion confirmation modal with loading feedback and scroll preservation.
-   - `resources/js/Components/Icons.jsx`: Extended with all 11 clean SVG icons.
-   - `resources/js/Pages/Dashboard.jsx`: 7-day Due Soon alert banner, financial metric cards (BRL monthly projection, foreign USD/EUR totals, active/paused ratio), search & multi-filter bar with reset, responsive desktop table and mobile touch cards, and one-click status toggle action.
-
-4. **Milestone 4 — Automated Test Suite**:
-   - `tests/Feature/SubscriptionTest.php`: 33 comprehensive feature tests (314 assertions) covering Anti-IDOR (403), Anti-XSS tag stripping, validation failures, business logic calculations, due_soon boundaries, and CRUD workflows.
-   - Entire application test suite: 88 passing tests (865 assertions).
-
-5. **Milestone 5 — Final Adversarial Hardening & Forensic Integrity Audit**:
-   - `tests/Feature/SubscriptionAdversarialStressTest.php`: 10 white-box stress tests verifying concurrent tenant isolation, rate limiting throttle 60,1 (61st request rejected with HTTP 429), decimal repeating rounding, and empty state resilience.
-   - Forensic Auditor Verdict: **CLEAN** (active fault injections proved tests authentically fail if defenses are removed).
-   - Pint Code Formatter: Passed exit code 0 (`{"tool":"pint","result":"passed"}`).
-   - Vite Production Build: Passed exit code 0 (`✓ built in 887ms`).
+**From**: Project Orchestrator Gen 1 (`orchestrator_1`)  
+**To**: Project Orchestrator Gen 2 (Successor)  
+**Parent (Sentinel)**: `a0cd4154-118b-476e-a8dc-f1f789e6fa70`  
+**Timestamp**: 2026-09-23T16:21:00Z  
+**Working Directory**: `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1`  
+**Handoff Type**: Soft (Spawn threshold 16 reached, state checkpoint)
 
 ---
 
-## 2. Logic Chain
+## 1. Milestone State
 
-1. **Secure by Design Architecture**:
-   - Tenant isolation is enforced at the database level (`user_id` foreign key cascade), Eloquent level (mass assignment exclusion of `user_id`), policy level (`SubscriptionPolicy`), and controller level (`Gate::authorize`).
-   - XSS is neutralized at ingress (`prepareForValidation` using `strip_tags` and `trim`) and client egress (React text escaping, no `dangerouslySetInnerHTML`).
-   - Data leaks over Inertia JSON hydration are blocked by `SubscriptionResource`, preventing internal database columns or relationship leaks.
-   - Route throttling (`throttle:60,1`) protects against mutation flooding.
-
-2. **Accounting Precision**:
-   - Yearly subscriptions are normalized to monthly equivalents (`round(price / 12, 2)`).
-   - Paused subscriptions are strictly excluded from projected monthly expenses.
-   - Totals are aggregated per currency rather than converted via unstable live rates.
-
-3. **User Experience Parity**:
-   - Desktop and mobile layouts provide full functional parity (both support quick status toggle, edit, delete, and detail inspection).
-   - Category badges provide deterministic color hashing without requiring server-side color management.
+| # | Milestone | Scope | Status | Notes |
+|---|-----------|-------|--------|-------|
+| M0 | Survey & Planning | Feature inventory, PROJECT.md, TEST_INFRA.md | **DONE** | 3 Survey Explorers completed; 16 features mapped |
+| E2E | E2E Test Suite | Tiers 1-4 opaque-box requirement tests | **DONE** | 87 tests passing; `TEST_READY.md` published |
+| M1 | Dependencies & Notification System | Package installs, Sonner Toaster, CRUD/toggle toasts, flash props, 0 CLS | **DONE** | Unanimous APPROVE gate; Forensic Auditor CLEAN; 87 PHPUnit, 59 Pint, 87 E2E pass |
+| M2 | Fluid Interface Animations | Spring modals (F4), staggered entrance (F5), smooth sort/filter (F6) | **EXPLORED** | M2.1, M2.2, M2.3 completed full architecture reports. Ready for Worker M2. |
+| M3 | Financial Analytics Charts | Recharts Donut & 6-12m Area/Bar projections | **PLANNED** | Survey 1 mapped math & components in `financialProjections.js` |
+| M4 | Advanced 3D WebGL Cosmic Showcase | React Three Fiber, PBR lighting, 3D rings, particles, rotation damping | **PLANNED** | Survey 3 mapped R3F v8 + Drei v9 + Three v0.170 |
+| M5 | Final Acceptance & Adversarial Hardening | Phase 1: 100% E2E tests, Phase 2: Tier 5 adversarial tests | **PLANNED** | Acceptance verification |
 
 ---
 
-## 3. Caveats
-
-- **Timezone Drift**: Handled correctly. Dates are parsed via `YYYY-MM-DD` split strings in JavaScript, eliminating client-side timezone off-by-one errors.
-- **Sail Container Execution**: Commands must be executed within container context (via `docker compose exec -T laravel.test ...` or `wsl -d Ubuntu -e bash -c "./vendor/bin/sail ..."`).
+## 2. Active Subagents
+- None. All 16 subagents spawned in Generation 1 have completed their tasks and delivered their handoffs.
 
 ---
 
-## 4. Conclusion & Gate Verdicts
-
-| Milestone | Scope | Gate Result | Forensic Audit |
-|---|---|:---:|:---:|
-| M1 | Backend Data & Models | **PASS** | CLEAN |
-| M2 | Security, Policy & API | **PASS** | CLEAN |
-| M3 | Frontend Components & Dashboard | **PASS** | CLEAN |
-| M4 | Automated Test Suite (SubscriptionTest) | **PASS** | CLEAN |
-| M5 | Adversarial Hardening & Final Audit | **PASS** | CLEAN |
-
-The project is 100% complete and ready for production delivery.
+## 3. Pending Decisions & Constraints
+1. **Docker Container Execution**: All commands must run inside the container via `docker compose exec -T laravel.test <command>`.
+2. **Package Ecosystem**: Dependencies are already installed (`sonner`, `framer-motion`, `recharts`, `three@0.170.0`, `@react-three/fiber@8.18.0`, `@react-three/drei@9.122.0`). `.npmrc` has `allow-remote=all` and `legacy-peer-deps=true`.
+3. **Modal Component**: `resources/js/Components/Modal.jsx` must wrap `@headlessui/react` `<Dialog static open={show} onClose={close}>` with Framer Motion `<AnimatePresence>` and `<DialogPanel as={motion.div}>` using spring physics (`damping: 26, stiffness: 360, mass: 0.8`). All 3 modal consumers retain 100% prop compatibility.
+4. **Dashboard Layout Animations**:
+   - Staggered entrance on `Dashboard.jsx`: `staggerContainer` (`staggerChildren: 0.08`, `delayChildren: 0.05`) revealing Due Soon banner, 3 metric cards, analytics section placeholder (`min-h-[340px]`), search/filter bar, and content.
+   - Table row animations: use `motion.tr` with `layout="position"` inside `<AnimatePresence initial={false}>` to avoid cell width distortion. Fixed column percentage widths.
+   - Mobile cards: use `motion.div` with `<AnimatePresence mode="popLayout" initial={false}>`.
+   - Sorting state: add `sortField` and `sortOrder` in `Dashboard.jsx` with clickable table header indicators and a mobile `<SelectInput>` sort selector.
+5. **Auditor Veto**: Forensic Auditor verdict is a non-negotiable binary veto.
 
 ---
 
-## 5. Verification Commands
+## 4. Remaining Work (Concrete Next Steps for Successor)
 
-```bash
-# 1. Run Subscription Feature Tests
-docker compose exec -T laravel.test php artisan test --filter=SubscriptionTest
+1. **Step 1 (Milestone 2 Worker)**:
+   - Create workspace `.agents/teamwork_preview_worker_m2/`.
+   - Spawn Worker M2 (`teamwork_preview_worker`) with Explorer M2.1, M2.2, and M2.3 reports to implement:
+     - `resources/js/Components/Modal.jsx` (spring physics).
+     - `resources/js/Pages/Dashboard.jsx` (sorting state, header chevrons, mobile sort dropdown, `motion.tr layout="position"`, mobile card `mode="popLayout"`, staggered entrance container).
+   - Require Worker M2 to run container verification: `php artisan test`, `pint --test`, `npm run build`, and `node tests/e2e/run_all.js`.
+2. **Step 2 (Milestone 2 Verification Panel & Gate)**:
+   - Spawn 2 Reviewers, 2 Challengers, and 1 Forensic Auditor (`teamwork_preview_auditor`).
+   - Evaluate Gate and record in `GATE_STATUS.md`.
+3. **Step 3 (Milestone 3: Financial Analytics Charts)**:
+   - Implement `financialProjections.js`, `CategorySpendingDonutChart.jsx`, `MonthlyExpenditureProjectionChart.jsx`, `FinancialAnalyticsSection.jsx`, and integrate into `Dashboard.jsx`.
+   - Run Iteration Loop (Explorers -> Worker -> Reviewers -> Challengers -> Auditor -> Gate).
+4. **Step 4 (Milestone 4: Advanced 3D WebGL Cosmic Showcase)**:
+   - Upgrade `resources/js/Components/CosmicShowcase3D.jsx` using `@react-three/fiber` and `@react-three/drei`.
+   - Run Iteration Loop (Explorers -> Worker -> Reviewers -> Challengers -> Auditor -> Gate).
+5. **Step 5 (Milestone 5: Final E2E Acceptance & Adversarial Hardening)**:
+   - Phase 1: Verify 100% pass of E2E test suite (Tiers 1-4).
+   - Phase 2: Adversarial coverage hardening (Tier 5) with Challengers and Workers.
+   - Final quality checks: `php artisan test` (100%), `pint --test` (100%), `npm run build` (100%).
+   - Report final completion to Sentinel parent (`a0cd4154-118b-476e-a8dc-f1f789e6fa70`).
 
-# 2. Run Complete Application Test Suite
-docker compose exec -T laravel.test php artisan test
+---
 
-# 3. Check Code Formatting
-docker compose exec -T laravel.test ./vendor/bin/pint --format agent
-
-# 4. Compile Frontend Production Assets
-docker compose exec -T laravel.test npm run build
-```
+## 5. Key Artifacts
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\ORIGINAL_REQUEST.md` — Authoritative requirements
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1\PROJECT.md` — Master Architecture & Milestone Plan
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1\TEST_INFRA.md` — E2E Test Strategy & Matrix
+- `z:\home\guilhherme\projetos\meu-app-react\TEST_READY.md` — E2E Test Suite Runner & Status
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1\GATE_STATUS.md` — Gate Status Tracker
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1\BRIEFING.md` — Orchestrator Persistent Memory
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\orchestrator_1\progress.md` — Liveness & Progress Checklist
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\teamwork_preview_explorer_m2_1\analysis.md` — Modal Spring Physics Blueprint
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\teamwork_preview_explorer_m2_2\analysis.md` — Staggered Entrance Blueprint
+- `z:\home\guilhherme\projetos\meu-app-react\.agents\teamwork_preview_explorer_m2_3\analysis.md` — Table & Mobile Sorting Layout Animation Blueprint
