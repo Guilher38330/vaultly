@@ -129,7 +129,7 @@ app/
 ├── Models/Subscription.php                    # Scopes, accessors e proteção Mass Assignment
 └── Policies/SubscriptionPolicy.php           # Autorização Anti-IDOR
 
-resources/js/
+resources/js/ 
 ├── Components/
 │   ├── Subscriptions/
 │   │   ├── CategoryBadge.jsx                 # Badges com hash de cor determinístico

@@ -4,7 +4,6 @@ import {
     PieChart,
     Pie,
     Cell,
-    Tooltip,
     Sector,
 } from 'recharts';
 import { useReducedMotion } from 'framer-motion';
@@ -33,43 +32,7 @@ function formatMoney(amount, currency = 'BRL') {
     }
 }
 
-/**
- * Custom glassmorphic tooltip with category name, spend amount, and percentage.
- */
-function CustomDonutTooltip({ active, payload, currency = 'BRL' }) {
-    if (!active || !payload || !payload.length) return null;
 
-    const item = payload[0]?.payload;
-    if (!item) return null;
-
-    return (
-        <div className="rounded-xl border border-zinc-200/90 bg-white/95 p-3 shadow-xl backdrop-blur-md transition-all duration-150 dark:border-zinc-700/80 dark:bg-zinc-900/95 dark:shadow-2xl dark:shadow-black/50 min-w-[170px]">
-            <div className="flex items-center gap-2 mb-1.5">
-                <span
-                    className="h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-zinc-900 shrink-0"
-                    style={{ backgroundColor: item.color }}
-                />
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-700 dark:text-zinc-200 truncate max-w-[140px]">
-                    {item.name}
-                </span>
-            </div>
-            <div className="flex items-baseline justify-between gap-3">
-                <span className="text-sm font-extrabold text-zinc-900 dark:text-zinc-50">
-                    {formatMoney(item.value, currency)}
-                    <span className="text-[10px] font-normal text-zinc-500 dark:text-zinc-400">/mês</span>
-                </span>
-                <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                    {item.percentage}%
-                </span>
-            </div>
-            {item.count !== undefined && (
-                <div className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
-                    {item.count} {item.count === 1 ? 'assinatura ativa' : 'assinaturas ativas'}
-                </div>
-            )}
-        </div>
-    );
-}
 
 /**
  * Active shape renderer for interactive slice expansion on hover.
@@ -221,10 +184,7 @@ export default function CategorySpendingDonutChart({
                     <div className="relative w-full h-[280px] min-h-[280px] min-w-0 flex items-center justify-center my-1">
                         <ResponsiveContainer width="100%" height={280} minWidth={0} minHeight={280}>
                             <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                                <Tooltip
-                                    content={<CustomDonutTooltip currency={selectedCurrency} />}
-                                    wrapperStyle={{ outline: 'none', pointerEvents: 'none' }}
-                                />
+
                                 <Pie
                                     data={data}
                                     dataKey="value"
@@ -242,6 +202,9 @@ export default function CategorySpendingDonutChart({
                                     activeShape={renderActiveSector}
                                     onMouseEnter={handlePieEnter}
                                     onMouseLeave={handlePieLeave}
+                                    onClick={(_, index) => {
+                                        if (data[index]) handleLegendClick(data[index]);
+                                    }}
                                     isAnimationActive={!shouldReduceMotion}
                                     animationDuration={shouldReduceMotion ? 0 : 800}
                                     animationEasing="ease-out"
@@ -266,7 +229,7 @@ export default function CategorySpendingDonutChart({
                             className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center p-2 select-none"
                             aria-live="polite"
                         >
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 transition-colors">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 transition-colors truncate px-2 max-w-[120px]">
                                 {activeItem ? activeItem.name : 'Total Ativo'}
                             </span>
                             <span className="text-xl sm:text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 transition-all">
@@ -274,8 +237,15 @@ export default function CategorySpendingDonutChart({
                             </span>
                             <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
                                 {activeItem ? (
-                                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                                        {activeItem.percentage}% do total
+                                    <span className="flex flex-col items-center gap-0.5">
+                                        <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                                            {activeItem.percentage}% do total
+                                        </span>
+                                        {activeItem.count !== undefined && (
+                                            <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                                                {activeItem.count} {activeItem.count === 1 ? 'assinatura ativa' : 'assinaturas ativas'}
+                                            </span>
+                                        )}
                                     </span>
                                 ) : (
                                     '/mês'
@@ -302,7 +272,9 @@ export default function CategorySpendingDonutChart({
                                         onClick={() => handleLegendClick(item)}
                                         onMouseEnter={() => setActiveIndex(index)}
                                         onMouseLeave={() => setActiveIndex(null)}
-                                        className={`w-full flex items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-xs transition-all ${
+                                        onFocus={() => setActiveIndex(index)}
+                                        onBlur={() => setActiveIndex(null)}
+                                        className={`w-full flex items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-xs transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-zinc-900 ${
                                             isActive
                                                 ? 'bg-zinc-100/90 ring-1 ring-emerald-500/50 shadow-xs dark:bg-zinc-800/90'
                                                 : isDimmed
