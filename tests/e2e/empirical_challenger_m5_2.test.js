@@ -728,7 +728,7 @@ describe('Empirical Challenger M5.2: Adversarial Coverage Hardening Suite', () =
 
     test('T3.3: Rich mutation feedback handles all CRUD actions with accurate text and icons', () => {
       const actions = [
-        { action: 'created', name: 'Netflix', status: undefined, expectedMsg: 'Assinatura cadastrada!', type: 'success' },
+        { action: 'created', name: 'Netflix', status: undefined, expectedMsg: 'Assinatura adicionada!', type: 'success' },
         { action: 'updated', name: 'HBO Max', status: undefined, expectedMsg: 'Assinatura atualizada!', type: 'success' },
         { action: 'deleted', name: 'Prime', status: undefined, expectedMsg: 'Assinatura removida!', type: 'success' },
         { action: 'status_toggled', name: 'Spotify', status: 'paused', expectedMsg: 'Assinatura pausada', type: 'info' },

@@ -53,24 +53,29 @@ export default function ToastContainer() {
 
         // 3. Global Inertia router listener for backend session flash data
         const removeRouterListener = router.on('success', (event) => {
-            // Suppress generic backend message if client-side notification recently dispatched
-            if (isRecentClientToast(1500)) {
-                return;
-            }
-
             const flash = event.detail?.page?.props?.flash;
-            if (flash?.success) {
-                toast.success(flash.success);
-            }
-            if (flash?.error) {
-                toast.error(flash.error);
-            }
-            if (flash?.info) {
-                toast.info(flash.info);
-            }
-            if (flash?.warning) {
-                toast.warning(flash.warning);
-            }
+
+            // Defer execution slightly so page-level onSuccess callbacks can run first
+            // and update lastClientToastTimestamp
+            setTimeout(() => {
+                // Suppress generic backend message if client-side notification recently dispatched
+                if (isRecentClientToast(1500)) {
+                    return;
+                }
+
+                if (flash?.success) {
+                    toast.success(flash.success);
+                }
+                if (flash?.error) {
+                    toast.error(flash.error);
+                }
+                if (flash?.info) {
+                    toast.info(flash.info);
+                }
+                if (flash?.warning) {
+                    toast.warning(flash.warning);
+                }
+            }, 10);
         });
 
         return () => {

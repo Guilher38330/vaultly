@@ -53,6 +53,33 @@ class SubscriptionController extends Controller
         $activeCount = $subscriptions->where('status', 'active')->count();
         $pausedCount = $subscriptions->where('status', 'paused')->count();
 
+        // Fetch exchange rates and project to BRL
+        $exchangeRates = \Illuminate\Support\Facades\Cache::remember('exchange_rates', 3600, function () {
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(3)->get('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL');
+                if ($response->successful()) {
+                    $data = $response->json();
+                    return [
+                        'USD' => (float) ($data['USDBRL']['ask'] ?? 1.0),
+                        'EUR' => (float) ($data['EURBRL']['ask'] ?? 1.0),
+                    ];
+                }
+            } catch (\Exception $e) {
+                // Ignore exception and return fallback below
+            }
+            return ['USD' => 1.0, 'EUR' => 1.0];
+        });
+
+        $projectedTotalBrl = $totals['BRL'] ?? 0;
+        $projectedYearlyTotalBrl = $yearlyTotals['BRL'] ?? 0;
+
+        foreach (['USD', 'EUR'] as $currency) {
+            if (isset($totals[$currency])) {
+                $projectedTotalBrl += $totals[$currency] * ($exchangeRates[$currency] ?? 1.0);
+                $projectedYearlyTotalBrl += $yearlyTotals[$currency] * ($exchangeRates[$currency] ?? 1.0);
+            }
+        }
+
         $dueSoon = $user->subscriptions()
             ->active()
             ->dueSoon(7)
@@ -70,6 +97,9 @@ class SubscriptionController extends Controller
             'metrics' => [
                 'totals' => $totals,
                 'yearly_totals' => $yearlyTotals,
+                'projected_total_brl' => round($projectedTotalBrl, 2),
+                'projected_yearly_total_brl' => round($projectedYearlyTotalBrl, 2),
+                'exchange_rates' => $exchangeRates,
                 'active_count' => $activeCount,
                 'paused_count' => $pausedCount,
                 'due_soon_count' => $dueSoon->count(),

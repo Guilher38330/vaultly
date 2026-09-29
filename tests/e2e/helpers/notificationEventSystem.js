@@ -84,7 +84,7 @@ export class NotificationEventSystem {
     const safeName = subscriptionName || 'Assinatura';
     switch (action) {
       case 'created':
-        return this.emitToast('success', 'Assinatura cadastrada!', {
+        return this.emitToast('success', 'Assinatura adicionada!', {
           description: `"${safeName}" foi adicionada com sucesso.`,
           action: 'created',
           target: safeName

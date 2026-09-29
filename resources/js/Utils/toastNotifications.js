@@ -30,8 +30,8 @@ export function notifySubscriptionMutation(action, subscriptionName, status) {
 
     switch (action) {
         case 'created':
-            return toast.success('Assinatura cadastrada!', {
-                description: `"${safeName}" foi adicionada com sucesso ao seu rastreador.`,
+            return toast.success('Assinatura adicionada!', {
+                description: `"${safeName}" já está no seu rastreador.`,
                 duration: 4000,
             });
 

@@ -159,6 +159,9 @@ export default function Dashboard({
     metrics = {
         totals: { BRL: 0, USD: 0, EUR: 0 },
         yearly_totals: { BRL: 0, USD: 0, EUR: 0 },
+        projected_total_brl: 0,
+        projected_yearly_total_brl: 0,
+        exchange_rates: { USD: 1.0, EUR: 1.0 },
         active_count: 0,
         paused_count: 0,
         due_soon_count: 0,
@@ -480,20 +483,27 @@ export default function Dashboard({
                         >
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                                    Total Mensal Projetado
+                                    Total Mensal Projetado (BRL)
                                 </span>
                                 <span className="rounded-xl bg-emerald-100 p-2 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400">
                                     <CurrencyDollarIcon className="h-5 w-5" />
                                 </span>
                             </div>
                             <p className="mt-3 text-2xl font-extrabold text-zinc-900 dark:text-zinc-100">
-                                {formatCurrency(metrics.totals?.BRL || 0, 'BRL')}
+                                {formatCurrency(metrics.projected_total_brl || metrics.totals?.BRL || 0, 'BRL')}
                             </p>
-                            <div className="mt-2 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
-                                <span>{metrics.active_count || 0} assinaturas ativas em BRL</span>
-                                {metrics.yearly_totals?.BRL > 0 && (
-                                    <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                                        ~{formatCurrency(metrics.yearly_totals.BRL, 'BRL')}/ano
+                            <div className="mt-2 flex flex-col gap-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                <div className="flex items-center justify-between">
+                                    <span>{metrics.active_count || 0} assinaturas ativas</span>
+                                    {(metrics.projected_yearly_total_brl > 0 || metrics.yearly_totals?.BRL > 0) && (
+                                        <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                                            ~{formatCurrency(metrics.projected_yearly_total_brl || metrics.yearly_totals?.BRL || 0, 'BRL')}/ano
+                                        </span>
+                                    )}
+                                </div>
+                                {(metrics.totals?.USD > 0 || metrics.totals?.EUR > 0) && (
+                                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-1">
+                                        *Inclui conversão com cotação atual (USD: R$ {metrics.exchange_rates?.USD?.toFixed(2)}, EUR: R$ {metrics.exchange_rates?.EUR?.toFixed(2)})
                                     </span>
                                 )}
                             </div>
@@ -725,7 +735,7 @@ export default function Dashboard({
                                     <SparkleIcon className="h-8 w-8" />
                                 </div>
                                 <h3 className="mt-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                                    Nenhuma assinatura cadastrada ainda.
+                                    Nenhuma assinatura adicionada ainda.
                                 </h3>
                                 <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
                                     Comece adicionando seus serviços recorrentes como Netflix, Spotify, planos de hospedagem ou internet!

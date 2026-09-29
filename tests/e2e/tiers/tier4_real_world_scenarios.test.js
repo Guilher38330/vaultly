@@ -95,7 +95,7 @@ describe('Tier 4: Real-World Application Scenarios', async () => {
     notifySystem.notifySubscriptionMutation('created', newSub.name);
     const createToast = notifySystem.findToastByAction('created');
     assert.ok(createToast);
-    assert.equal(createToast.message, 'Assinatura cadastrada!');
+    assert.equal(createToast.message, 'Assinatura adicionada!');
     assert.ok(createToast.description.includes('Disney+ Standard'));
 
     let donut = engine.calculateCategoryBreakdown(portfolio, 'BRL');

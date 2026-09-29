@@ -186,7 +186,7 @@ describe('Tier 1: Feature Coverage (R1 - R5)', async () => {
       const toast = notifySystem.findToastByAction('created');
       assert.ok(toast);
       assert.equal(toast.type, 'success');
-      assert.equal(toast.message, 'Assinatura cadastrada!');
+      assert.equal(toast.message, 'Assinatura adicionada!');
       assert.ok(toast.description.includes('Disney+'));
     });
 
